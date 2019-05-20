@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
-class GraphSaveTest(@Autowired val graphRepository: GraphRepository) {
+class GraphSaveTest {
+    @Autowired lateinit var graphSave: GraphSave
     @Test
     fun savesSimpleStructure() {
         val graph = Graph(name = "Graph 1")
         val params = GraphSaveParams(graph = graph)
-        val saver = GraphSave(graphRepository)
-        val savedGraph = saver.save(params)
+//        val saver = GraphSave(graphRepository)
+        val savedGraph = graphSave.save(params)
         println(graph.id)
         println(savedGraph.id)
     }
