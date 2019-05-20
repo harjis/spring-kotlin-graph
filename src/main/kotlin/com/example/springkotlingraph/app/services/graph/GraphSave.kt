@@ -5,10 +5,10 @@ import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.springframework.stereotype.Service
 
 @Service
-class GraphSave(val graphRepository: GraphRepository) {
-    fun save(params: SaveParams) {
-        graphRepository.save(params.graph)
+class GraphSave(private val graphRepository: GraphRepository) {
+    fun save(params: GraphSaveParams): Graph {
+        return graphRepository.save(params.graph)
     }
 }
 
-data class SaveParams(val graph: Graph)
+data class GraphSaveParams(val graph: Graph)
