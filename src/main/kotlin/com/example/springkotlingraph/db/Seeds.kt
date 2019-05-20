@@ -1,5 +1,6 @@
 package com.example.springkotlingraph.db
 
+import com.example.springkotlingraph.app.entities.Edge
 import com.example.springkotlingraph.app.entities.Graph
 import com.example.springkotlingraph.app.entities.Node
 import com.example.springkotlingraph.app.repositories.GraphRepository
@@ -15,7 +16,8 @@ class Seeds {
     fun initDatabase(graphRepository: GraphRepository) = CommandLineRunner {
         val graph = Graph(name = "Graph 1")
         val node1 = Node(name = "Node 1", graph = graph)
-        val nod2 = Node(name = "Node 2", graph = graph)
+        val node2 = Node(name = "Node 2", graph = graph)
+        Edge(fromNode = node1, toNode = node2)
         graphRepository.save(graph)
     }
 }
