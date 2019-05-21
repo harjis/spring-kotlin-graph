@@ -7,13 +7,15 @@ import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 
-@DataJpaTest
+@SpringBootTest
 class GraphTest (
         @Autowired val graphRepository: GraphRepository
 ) {
     @Test
+    @Transactional // Wether or not this should be transactional is unknown
     fun testSomething() {
         val graph = Graph(name = "Graph 1")
         val node1 = Node(name = "Node 1", graph = graph)

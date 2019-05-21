@@ -7,9 +7,11 @@ import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import javax.transaction.Transactional
 
 @Configuration
+@Profile("dev")
 class Seeds {
     @Bean
     @Transactional
