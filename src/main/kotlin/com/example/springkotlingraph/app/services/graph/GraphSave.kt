@@ -21,9 +21,12 @@ class GraphSave(private val graphRepository: GraphRepository) {
             val persistedNodeIds: List<Long> = graph.nodes.map { it.id }.filterNotNull()
             val newNodeIds = params.nodes.map { it.id }.filterNotNull()
             val toBeDeleted = persistedNodeIds.minus(newNodeIds)
-            params.nodes.forEach {
+            params.nodes.filter { it.id != null }.forEach {
                 val persistedNode = graph.nodes.find { node -> node.id == it.id }
                 persistedNode!!.name = it.name
+            }
+            params.nodes.filter { it.id == null }.forEach {
+                Node(name = it.name, graph = graph)
             }
             graph.deleteNodes(toBeDeleted)
             graph.name = params.graph.name
