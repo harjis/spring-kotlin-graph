@@ -11,32 +11,38 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class GraphSave(private val graphRepository: GraphRepository) {
     fun save(params: GraphSaveParams): Graph {
-        val graph = if (params.graph.id != null) {
-            this.update(params)
+        return if (params.graph.id != null) {
+            update(params)
         } else {
-            this.create(params)
+            create(params)
         }
-        return graph
     }
 
     private fun create(params: GraphSaveParams): Graph {
-        val graph = Graph(name = params.graph.name)
+        val graph = upsert(params.graph)
         params.nodes.forEach { Node(name = it.name, graph = graph) }
-        graphRepository.save(graph)
-        return graph
+        return graphRepository.save(graph)
     }
 
     private fun update(params: GraphSaveParams): Graph {
-        val graph = this.getGraph(params.graph.id)
-        this.updateNodes(params)
-        this.createNodes(params)
-        this.deleteNodes(params)
-        graph.name = params.graph.name
-        return graph
+        updateNodes(params)
+        createNodes(params)
+        deleteNodes(params)
+        return upsert(params.graph)
+    }
+
+    private fun upsert(graphParams: GraphParams): Graph {
+        return if (graphParams.id == null) {
+            Graph(name = graphParams.name)
+        } else {
+            val graph = getGraph(graphParams.id)
+            graph.name = graphParams.name
+            graph
+        }
     }
 
     private fun updateNodes(params: GraphSaveParams) {
-        val graph = this.getGraph(params.graph.id)
+        val graph = getGraph(params.graph.id)
         params.nodes.filter { it.id != null }.forEach {
             val persistedNode = graph.nodes.find { node -> node.id == it.id }
             persistedNode!!.name = it.name
@@ -44,14 +50,14 @@ class GraphSave(private val graphRepository: GraphRepository) {
     }
 
     private fun createNodes(params: GraphSaveParams) {
-        val graph = this.getGraph(params.graph.id)
+        val graph = getGraph(params.graph.id)
         params.nodes.filter { it.id == null }.forEach {
             Node(name = it.name, graph = graph)
         }
     }
 
     private fun deleteNodes(params: GraphSaveParams) {
-        val graph = this.getGraph(params.graph.id)
+        val graph = getGraph(params.graph.id)
         val persistedNodeIds: List<Long> = graph.nodes.map { it.id }.filterNotNull()
         val newNodeIds = params.nodes.map { it.id }.filterNotNull()
         val toBeDeleted = persistedNodeIds.minus(newNodeIds)
