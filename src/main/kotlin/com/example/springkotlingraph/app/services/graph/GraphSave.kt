@@ -16,20 +16,23 @@ class GraphSave(private val graphRepository: GraphRepository) {
     }
 
     private fun toGraph(params: GraphSaveParams): Graph {
-        val graph: Graph = if (params.graph.id != null) {
+        return if (params.graph.id != null) {
             val graph = graphRepository.findById(params.graph.id).orElseThrow { EntityNotFound(params.graph.id) }
-            graph.name = params.graph.name
-            graph.nodes.forEach {
-                val updateNode = params.nodes.find { nodeParams -> nodeParams.id == it.id }
-                it.name = updateNode!!.name
+            val persistedNodeIds: List<Long> = graph.nodes.map { it.id }.filterNotNull()
+            val newNodeIds = params.nodes.map { it.id }.filterNotNull()
+            val toBeDeleted = persistedNodeIds.minus(newNodeIds)
+            params.nodes.forEach {
+                val persistedNode = graph.nodes.find { node -> node.id == it.id }
+                persistedNode!!.name = it.name
             }
+            graph.deleteNodes(toBeDeleted)
+            graph.name = params.graph.name
             graph
         } else {
             val graph = Graph(name = params.graph.name)
             params.nodes.forEach { Node(name = it.name, graph = graph) }
             graph
         }
-        return graph
     }
 }
 

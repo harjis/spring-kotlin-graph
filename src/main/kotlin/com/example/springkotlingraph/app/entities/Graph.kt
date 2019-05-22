@@ -11,4 +11,8 @@ class Graph(
         @JsonManagedReference
         @OneToMany(mappedBy = "graph", cascade = [CascadeType.ALL])
         val nodes: MutableSet<Node> = mutableSetOf()
-) : AbstractJpaPersistable<Long>()
+) : AbstractJpaPersistable<Long>() {
+    fun deleteNodes(nodeIds: List<Long>) {
+        this.nodes.removeIf { nodeIds.contains(it.id) }
+    }
+}
