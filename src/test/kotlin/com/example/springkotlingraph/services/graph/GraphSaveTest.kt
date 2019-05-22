@@ -49,4 +49,23 @@ class GraphSaveTest {
         val savedGraph = graphs.first()
         Assertions.assertThat(savedGraph.nodes.count()).isEqualTo(2)
     }
+
+    @Test
+    fun canUpdateGraphNodes() {
+        val nodesParams = mutableSetOf<NodeParams>(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
+        val savedGraph = graphSave.save(params)
+        val updateParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map { NodeParams(id = it.id, name = "Updated " + it.name) }.toMutableSet()
+        )
+        graphSave.save(updateParams)
+        val graphs = graphRepository.findAll()
+        Assertions.assertThat(graphs.count()).isEqualTo(1)
+        val graph = graphs.first()
+        Assertions.assertThat(graph.name).isEqualTo("Updated Graph 1")
+        Assertions.assertThat(graph.nodes.count()).isEqualTo(2)
+        Assertions.assertThat(graph.nodes.first().name).isEqualTo("Updated Node 1")
+        Assertions.assertThat(graph.nodes.last().name).isEqualTo("Updated Node 2")
+    }
 }

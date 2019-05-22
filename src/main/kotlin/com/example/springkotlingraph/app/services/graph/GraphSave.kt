@@ -19,6 +19,10 @@ class GraphSave(private val graphRepository: GraphRepository) {
         val graph: Graph = if (params.graph.id != null) {
             val graph = graphRepository.findById(params.graph.id).orElseThrow { EntityNotFound(params.graph.id) }
             graph.name = params.graph.name
+            graph.nodes.forEach {
+                val updateNode = params.nodes.find { nodeParams -> nodeParams.id == it.id }
+                it.name = updateNode!!.name
+            }
             graph
         } else {
             val graph = Graph(name = params.graph.name)
@@ -31,4 +35,4 @@ class GraphSave(private val graphRepository: GraphRepository) {
 
 data class GraphSaveParams(val graph: GraphParams, val nodes: MutableSet<NodeParams> = mutableSetOf())
 data class GraphParams(val id: Long? = null, val name: String)
-data class NodeParams(val name: String)
+data class NodeParams(val id: Long? = null, val name: String)
