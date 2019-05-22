@@ -4,6 +4,7 @@ import com.example.springkotlingraph.app.repositories.GraphRepository
 import com.example.springkotlingraph.app.services.graph.GraphParams
 import com.example.springkotlingraph.app.services.graph.GraphSave
 import com.example.springkotlingraph.app.services.graph.GraphSaveParams
+import com.example.springkotlingraph.app.services.graph.NodeParams
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,8 +39,14 @@ class GraphSaveTest {
         Assertions.assertThat(updatedGraph.name).isEqualTo("Updated Graph 1")
     }
 
-    @Transactional
     @Test
-    fun savesGraphsNodes() {
+    fun canSaveGraphNodes() {
+        val nodesParams = mutableSetOf<NodeParams>(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
+        graphSave.save(params)
+        val graphs = graphRepository.findAll()
+        Assertions.assertThat(graphs.count()).isEqualTo(1)
+        val savedGraph = graphs.first()
+        Assertions.assertThat(savedGraph.nodes.count()).isEqualTo(2)
     }
 }

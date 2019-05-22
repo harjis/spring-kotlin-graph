@@ -10,7 +10,7 @@ import javax.persistence.OneToMany
 
 @Entity
 class Node(
-        val name: String,
+        var name: String,
 
         @JsonBackReference
         @ManyToOne
