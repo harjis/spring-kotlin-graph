@@ -7,7 +7,7 @@ import javax.persistence.OneToMany
 
 @Entity
 class Graph(
-        val name: String,
+        var name: String,
         @JsonManagedReference
         @OneToMany(mappedBy = "graph", cascade = [CascadeType.ALL])
         val nodes: MutableSet<Node> = mutableSetOf()

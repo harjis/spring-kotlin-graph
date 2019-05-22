@@ -1,7 +1,7 @@
 package com.example.springkotlingraph.app.services.graph
 
 import com.example.springkotlingraph.app.entities.Graph
-import com.example.springkotlingraph.app.entities.Node
+import com.example.springkotlingraph.app.exceptions.EntityNotFound
 import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -10,19 +10,21 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class GraphSave(private val graphRepository: GraphRepository) {
     fun save(params: GraphSaveParams): Graph {
-        if (params.graph.id != null) {
-            val graph = graphRepository.findById(params.graph.id)
+        val graph = this.toGraph(params.graph)
+        return graphRepository.save(graph)
+    }
+
+    private fun toGraph(graphParams: GraphParams): Graph {
+        val graph: Graph = if (graphParams.id != null) {
+            var _graph = graphRepository.findById(graphParams.id).orElseThrow { EntityNotFound(graphParams.id) }
+            _graph.name = graphParams.name
+            _graph
         } else {
-            return graphRepository.save(params.graph.toGraph())
+            Graph(name = graphParams.name)
         }
-
-    }
-
-}
-
-class GraphSaveParams(val graph: GraphParams)
-class GraphParams(val id: Long? = null, val name: String) {
-    fun toGraph(): Graph {
-        return Graph(name = this.name)
+        return graph
     }
 }
+
+data class GraphSaveParams(val graph: GraphParams)
+data class GraphParams(val id: Long? = null, val name: String)
