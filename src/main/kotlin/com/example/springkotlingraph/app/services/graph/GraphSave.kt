@@ -25,8 +25,7 @@ class GraphSave(private val graphRepository: GraphRepository) {
     }
 
     private fun update(params: GraphSaveParams): Graph {
-        updateNodes(params)
-        createNodes(params)
+        upsertNodes(params)
         deleteNodes(params)
         return upsert(params.graph)
     }
@@ -41,18 +40,15 @@ class GraphSave(private val graphRepository: GraphRepository) {
         }
     }
 
-    private fun updateNodes(params: GraphSaveParams) {
+    private fun upsertNodes(params: GraphSaveParams) {
         val graph = getGraph(params.graph.id)
-        params.nodes.filter { it.id != null }.forEach {
-            val persistedNode = graph.nodes.find { node -> node.id == it.id }
-            persistedNode!!.name = it.name
-        }
-    }
-
-    private fun createNodes(params: GraphSaveParams) {
-        val graph = getGraph(params.graph.id)
-        params.nodes.filter { it.id == null }.forEach {
-            Node(name = it.name, graph = graph)
+        params.nodes.forEach {
+            if (it.id == null) {
+                Node(name = it.name, graph = graph)
+            } else {
+                val persistedNode = graph.nodes.find { node -> node.id == it.id }
+                persistedNode!!.name = it.name
+            }
         }
     }
 
