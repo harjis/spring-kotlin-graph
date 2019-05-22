@@ -41,7 +41,7 @@ class GraphSaveTest {
 
     @Test
     fun canSaveGraphNodes() {
-        val nodesParams = mutableSetOf<NodeParams>(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val nodesParams = mutableSetOf(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         graphSave.save(params)
         val graphs = graphRepository.findAll()
@@ -52,7 +52,7 @@ class GraphSaveTest {
 
     @Test
     fun canUpdateGraphNodes() {
-        val nodesParams = mutableSetOf<NodeParams>(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val nodesParams = mutableSetOf(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
