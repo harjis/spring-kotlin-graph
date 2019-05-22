@@ -27,27 +27,30 @@ class GraphSave(private val graphRepository: GraphRepository) {
 
     private fun update(params: GraphSaveParams): Graph {
         val graph = this.getGraph(params.graph.id)
-        this.updateNodes(params, graph)
-        this.createNodes(params, graph)
-        this.deleteNodes(params, graph)
+        this.updateNodes(params)
+        this.createNodes(params)
+        this.deleteNodes(params)
         graph.name = params.graph.name
         return graph
     }
 
-    private fun updateNodes(params: GraphSaveParams, graph: Graph) {
+    private fun updateNodes(params: GraphSaveParams) {
+        val graph = this.getGraph(params.graph.id)
         params.nodes.filter { it.id != null }.forEach {
             val persistedNode = graph.nodes.find { node -> node.id == it.id }
             persistedNode!!.name = it.name
         }
     }
 
-    private fun createNodes(params: GraphSaveParams, graph: Graph) {
+    private fun createNodes(params: GraphSaveParams) {
+        val graph = this.getGraph(params.graph.id)
         params.nodes.filter { it.id == null }.forEach {
             Node(name = it.name, graph = graph)
         }
     }
 
-    private fun deleteNodes(params: GraphSaveParams, graph: Graph) {
+    private fun deleteNodes(params: GraphSaveParams) {
+        val graph = this.getGraph(params.graph.id)
         val persistedNodeIds: List<Long> = graph.nodes.map { it.id }.filterNotNull()
         val newNodeIds = params.nodes.map { it.id }.filterNotNull()
         val toBeDeleted = persistedNodeIds.minus(newNodeIds)
