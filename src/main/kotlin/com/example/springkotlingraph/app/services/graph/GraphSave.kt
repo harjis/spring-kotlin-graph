@@ -16,12 +16,13 @@ class GraphSave(private val graphRepository: GraphRepository) {
         } else {
             this.create(params)
         }
-        return graphRepository.save(graph)
+        return graph
     }
 
     private fun create(params: GraphSaveParams): Graph {
         val graph = Graph(name = params.graph.name)
         params.nodes.forEach { Node(name = it.name, graph = graph) }
+        graphRepository.save(graph)
         return graph
     }
 
