@@ -9,8 +9,10 @@ import com.example.springkotlingraph.app.services.graph.NodeParams
 import org.assertj.core.api.Assert
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -175,5 +177,55 @@ class GraphSaveTest {
         val graphs = graphRepository.findAll()
         val graph = graphs.first()
         Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(0)
+    }
+
+    @Test
+    fun canNotCreateDuplicateEdges() {
+        val nodesParams = mutableSetOf(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
+        var savedGraph = graphSave.save(params)
+        val updateParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = "Updated " + it.name)
+                }.toMutableSet(),
+                edges = mutableSetOf(
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        ),
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        )
+                )
+        )
+        // This succeeds because Set can not have duplicate elements
+        savedGraph = graphSave.save(updateParams)
+        var graphs = graphRepository.findAll()
+        var graph = graphs.first()
+        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
+
+        val updateParams2 = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = "Updated " + it.name)
+                }.toMutableSet(),
+                edges = mutableSetOf(
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        ),
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        )
+                )
+        )
+
+        graphSave.save(updateParams2)
+        assertThrows<DataIntegrityViolationException> { graphs = graphRepository.findAll() }
+        graph = graphs.first()
+        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
     }
 }

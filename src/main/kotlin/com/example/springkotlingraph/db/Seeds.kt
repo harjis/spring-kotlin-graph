@@ -16,10 +16,10 @@ class Seeds {
     @Bean
     @Transactional
     fun initDatabase(graphRepository: GraphRepository) = CommandLineRunner {
-        val graph = Graph(name = "Graph 1")
-        val node1 = Node(name = "Node 1", graph = graph)
-        val node2 = Node(name = "Node 2", graph = graph)
-        Edge(fromNode = node1, toNode = node2)
-        graphRepository.save(graph)
+//        val graph = Graph(name = "Graph 1")
+//        val node1 = Node(name = "Node 1", graph = graph)
+//        val node2 = Node(name = "Node 2", graph = graph)
+//        Edge(fromNode = node1, toNode = node2)
+//        graphRepository.save(graph)
     }
 }

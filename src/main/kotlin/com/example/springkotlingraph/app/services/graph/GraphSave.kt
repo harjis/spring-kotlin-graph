@@ -1,6 +1,7 @@
 package com.example.springkotlingraph.app.services.graph
 
 import com.example.springkotlingraph.app.entities.Edge
+import com.example.springkotlingraph.app.entities.EdgeId
 import com.example.springkotlingraph.app.entities.Graph
 import com.example.springkotlingraph.app.entities.Node
 import com.example.springkotlingraph.app.exceptions.EntityNotFound
@@ -69,7 +70,11 @@ class GraphSave(private val graphRepository: GraphRepository) {
             val fromNode = graph.nodeById(it.fromNodeId)
             val toNode = graph.nodeById(it.toNodeId)
             if (fromNode is Node && toNode is Node) {
-                Edge(fromNode = fromNode, toNode = toNode)
+                Edge(
+                        id = EdgeId(fromNodeId = fromNode.id!!.toLong(), toNodeId = toNode.id!!.toLong()),
+                        fromNode = fromNode,
+                        toNode = toNode
+                )
             } else {
                 throw EntityNotFound("Could not find fromNode or toNode")
             }
@@ -79,8 +84,8 @@ class GraphSave(private val graphRepository: GraphRepository) {
     private fun deleteEdges(params: GraphSaveParams) {
         val graph = getGraph(params.graph.id)
         graph.uniqueEdges().forEach {
-            val edgeInParams = params.edges.find {
-                edgeParams -> edgeParams.fromNodeId == it.fromNode.id && edgeParams.toNodeId == it.toNode.id
+            val edgeInParams = params.edges.find { edgeParams ->
+                edgeParams.fromNodeId == it.fromNode.id && edgeParams.toNodeId == it.toNode.id
             }
             if (edgeInParams == null) {
                 graph.removeEdge(it)
@@ -97,4 +102,4 @@ class GraphSave(private val graphRepository: GraphRepository) {
 data class GraphSaveParams(val graph: GraphParams, val nodes: MutableSet<NodeParams> = mutableSetOf(), val edges: MutableSet<EdgeParams> = mutableSetOf())
 data class GraphParams(val id: Long? = null, val name: String)
 data class NodeParams(val id: Long? = null, val name: String)
-data class EdgeParams(val id: Long? = null, val fromNodeId: Long, val toNodeId: Long)
+data class EdgeParams(val fromNodeId: Long, val toNodeId: Long)
