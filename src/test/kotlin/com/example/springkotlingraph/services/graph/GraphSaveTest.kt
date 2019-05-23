@@ -145,4 +145,35 @@ class GraphSaveTest {
         val graph = graphs.first()
         Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
     }
+
+    @Test
+    fun canRemoveEdges() {
+        val nodesParams = mutableSetOf(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
+        val savedGraph = graphSave.save(params)
+        val updateParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = "Updated " + it.name)
+                }.toMutableSet(),
+                edges = mutableSetOf(
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        )
+                )
+        )
+        graphSave.save(updateParams)
+        val deleteParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = "Updated " + it.name)
+                }.toMutableSet(),
+                edges = mutableSetOf()
+        )
+        graphSave.save(deleteParams)
+        val graphs = graphRepository.findAll()
+        val graph = graphs.first()
+        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(0)
+    }
 }

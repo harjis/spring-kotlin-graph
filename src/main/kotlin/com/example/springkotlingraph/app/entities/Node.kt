@@ -28,4 +28,9 @@ class Node(
     init {
         this.graph.nodes.add(this)
     }
+
+    fun removeEdge(edge: Edge) {
+        this.fromEdges.removeIf { it.id == edge.id }
+        this.toEdges.removeIf { it.id == edge.id }
+    }
 }

@@ -24,4 +24,8 @@ class Graph(
     fun uniqueEdges(): MutableSet<Edge> {
         return this.nodes.flatMap { it.fromEdges.union(it.toEdges) }.distinctBy { it.id }.toMutableSet()
     }
+
+    fun removeEdge(edge: Edge) {
+        this.nodes.map { it.removeEdge(edge) }
+    }
 }

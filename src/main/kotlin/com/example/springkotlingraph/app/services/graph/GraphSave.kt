@@ -29,6 +29,7 @@ class GraphSave(private val graphRepository: GraphRepository) {
         upsertNodes(params)
         deleteNodes(params)
         saveEdges(params)
+        deleteEdges(params)
         return upsert(params.graph)
     }
 
@@ -71,6 +72,18 @@ class GraphSave(private val graphRepository: GraphRepository) {
                 Edge(fromNode = fromNode, toNode = toNode)
             } else {
                 throw EntityNotFound("Could not find fromNode or toNode")
+            }
+        }
+    }
+
+    private fun deleteEdges(params: GraphSaveParams) {
+        val graph = getGraph(params.graph.id)
+        graph.uniqueEdges().forEach {
+            val edgeInParams = params.edges.find {
+                edgeParams -> edgeParams.fromNodeId == it.fromNode.id && edgeParams.toNodeId == it.toNode.id
+            }
+            if (edgeInParams == null) {
+                graph.removeEdge(it)
             }
         }
     }
