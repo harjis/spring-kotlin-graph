@@ -5,4 +5,5 @@ import java.lang.RuntimeException
 
 class EntityNotFound : RuntimeException {
     constructor(id: Long) : super("Could not find entity with id: $id")
+    constructor(message: String) : super(message)
 }

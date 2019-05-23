@@ -1,10 +1,12 @@
 package com.example.springkotlingraph.services.graph
 
 import com.example.springkotlingraph.app.repositories.GraphRepository
+import com.example.springkotlingraph.app.services.graph.EdgeParams
 import com.example.springkotlingraph.app.services.graph.GraphParams
 import com.example.springkotlingraph.app.services.graph.GraphSave
 import com.example.springkotlingraph.app.services.graph.GraphSaveParams
 import com.example.springkotlingraph.app.services.graph.NodeParams
+import org.assertj.core.api.Assert
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -119,5 +121,28 @@ class GraphSaveTest {
         Assertions.assertThat(graph.nodes.first().name).isEqualTo("Updated Node 1")
         Assertions.assertThat(graph.nodes.elementAt(1).name).isEqualTo("Updated Node 2")
         Assertions.assertThat(graph.nodes.last().name).isEqualTo("New Node 3")
+    }
+
+    @Test
+    fun canSaveEdges() {
+        val nodesParams = mutableSetOf(NodeParams(name = "Node 1"), NodeParams(name = "Node 2"))
+        val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
+        val savedGraph = graphSave.save(params)
+        val updateParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = "Updated " + it.name)
+                }.toMutableSet(),
+                edges = mutableSetOf(
+                        EdgeParams(
+                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
+                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                        )
+                )
+        )
+        graphSave.save(updateParams)
+        val graphs = graphRepository.findAll()
+        val graph = graphs.first()
+        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
     }
 }

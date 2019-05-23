@@ -1,5 +1,6 @@
 package com.example.springkotlingraph.app.services.graph
 
+import com.example.springkotlingraph.app.entities.Edge
 import com.example.springkotlingraph.app.entities.Graph
 import com.example.springkotlingraph.app.entities.Node
 import com.example.springkotlingraph.app.exceptions.EntityNotFound
@@ -27,6 +28,7 @@ class GraphSave(private val graphRepository: GraphRepository) {
     private fun update(params: GraphSaveParams): Graph {
         upsertNodes(params)
         deleteNodes(params)
+        saveEdges(params)
         return upsert(params.graph)
     }
 
@@ -60,12 +62,26 @@ class GraphSave(private val graphRepository: GraphRepository) {
         graph.deleteNodes(toBeDeleted)
     }
 
+    private fun saveEdges(params: GraphSaveParams) {
+        val graph = getGraph(params.graph.id)
+        params.edges.forEach {
+            val fromNode = graph.nodeById(it.fromNodeId)
+            val toNode = graph.nodeById(it.toNodeId)
+            if (fromNode is Node && toNode is Node) {
+                Edge(fromNode = fromNode, toNode = toNode)
+            } else {
+                throw EntityNotFound("Could not find fromNode or toNode")
+            }
+        }
+    }
+
     private fun getGraph(id: Long?): Graph {
         if (id == null) throw Exception("Graph can not be updated without primary key")
         return graphRepository.findById(id).orElseThrow { EntityNotFound(id) }
     }
 }
 
-data class GraphSaveParams(val graph: GraphParams, val nodes: MutableSet<NodeParams> = mutableSetOf())
+data class GraphSaveParams(val graph: GraphParams, val nodes: MutableSet<NodeParams> = mutableSetOf(), val edges: MutableSet<EdgeParams> = mutableSetOf())
 data class GraphParams(val id: Long? = null, val name: String)
 data class NodeParams(val id: Long? = null, val name: String)
+data class EdgeParams(val id: Long? = null, val fromNodeId: Long, val toNodeId: Long)
