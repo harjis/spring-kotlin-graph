@@ -2,14 +2,18 @@ package com.example.springkotlingraph.app.entities
 
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonManagedReference
+import java.util.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
 class Node(
+        @Id
+        var id: UUID,
         var name: String,
 
         @JsonBackReference
@@ -24,7 +28,7 @@ class Node(
         @JsonManagedReference
         @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL])
         val toEdges: MutableSet<Edge> = mutableSetOf()
-) : AbstractJpaPersistable<Long>() {
+) {
     init {
         this.graph.nodes.add(this)
     }

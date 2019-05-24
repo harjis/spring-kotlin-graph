@@ -17,11 +17,11 @@ class Graph(
         val nodes: MutableSet<Node> = mutableSetOf()
 ) {
 
-    fun nodeById(nodeId: Long): Node? {
+    fun nodeById(nodeId: UUID): Node? {
         return this.nodes.find { it.id == nodeId }
     }
 
-    fun deleteNodes(nodeIds: List<Long>) {
+    fun deleteNodes(nodeIds: List<UUID>) {
         this.nodes.removeIf { nodeIds.contains(it.id) }
     }
 

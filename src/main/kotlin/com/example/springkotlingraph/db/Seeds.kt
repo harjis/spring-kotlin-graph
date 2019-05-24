@@ -18,9 +18,9 @@ class Seeds {
     @Transactional
     fun initDatabase(graphRepository: GraphRepository) = CommandLineRunner {
         val graph = Graph(id = UUID.randomUUID(), name = "Graph 1")
-        val node1 = Node(name = "Node 1", graph = graph)
-        val node2 = Node(name = "Node 2", graph = graph)
-        Edge(fromNode = node1, toNode = node2)
+        val node1 = Node(id = UUID.randomUUID(), name = "Node 1", graph = graph)
+        val node2 = Node(id = UUID.randomUUID(), name = "Node 2", graph = graph)
+        Edge(id = UUID.randomUUID(), fromNode = node1, toNode = node2)
         graphRepository.save(graph)
     }
 }

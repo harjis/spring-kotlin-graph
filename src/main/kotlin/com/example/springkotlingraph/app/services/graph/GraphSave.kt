@@ -21,7 +21,7 @@ class GraphSave(private val graphRepository: GraphRepository) {
 
     private fun create(params: GraphSaveParams): Graph {
         val graph = upsert(params.graph)
-        params.nodes.forEach { Node(name = it.name, graph = graph) }
+        params.nodes.forEach { Node(id = it.id, name = it.name, graph = graph) }
         return graphRepository.save(graph)
     }
 
@@ -96,5 +96,5 @@ class GraphSave(private val graphRepository: GraphRepository) {
 
 data class GraphSaveParams(val graph: GraphParams, val nodes: MutableSet<NodeParams> = mutableSetOf(), val edges: MutableSet<EdgeParams> = mutableSetOf())
 data class GraphParams(val id: UUID, val name: String)
-data class NodeParams(val id: Long? = null, val name: String)
-data class EdgeParams(val id: Long? = null, val fromNodeId: Long, val toNodeId: Long)
+data class NodeParams(val id: UUID, val name: String)
+data class EdgeParams(val id: UUID, val fromNodeId: UUID, val toNodeId: UUID)
