@@ -1,17 +1,21 @@
 package com.example.springkotlingraph.app.entities
 
 import com.fasterxml.jackson.annotation.JsonManagedReference
+import java.util.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.Id
 import javax.persistence.OneToMany
 
 @Entity
 class Graph(
+        @Id
+        var id: UUID,
         var name: String,
         @JsonManagedReference
         @OneToMany(mappedBy = "graph", cascade = [CascadeType.ALL])
         val nodes: MutableSet<Node> = mutableSetOf()
-) : AbstractJpaPersistable<Long>() {
+) {
 
     fun nodeById(nodeId: Long): Node? {
         return this.nodes.find { it.id == nodeId }

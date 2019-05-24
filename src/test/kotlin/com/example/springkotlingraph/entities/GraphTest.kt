@@ -9,15 +9,16 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @SpringBootTest
-class GraphTest (
+class GraphTest(
         @Autowired val graphRepository: GraphRepository
 ) {
     @Test
     @Transactional // Wether or not this should be transactional is unknown
     fun testSomething() {
-        val graph = Graph(name = "Graph 1")
+        val graph = Graph(id = UUID.randomUUID(), name = "Graph 1")
         val node1 = Node(name = "Node 1", graph = graph)
         val node2 = Node(name = "Node 2", graph = graph)
         Edge(fromNode = node1, toNode = node2)
