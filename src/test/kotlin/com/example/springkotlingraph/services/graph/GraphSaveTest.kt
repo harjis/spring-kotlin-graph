@@ -260,4 +260,38 @@ class GraphSaveTest {
         Assertions.assertThat(savedGraph.nodes.count()).isEqualTo(2)
         Assertions.assertThat(savedGraph.uniqueEdges().count()).isEqualTo(1)
     }
+
+    @Test
+    fun weirdEdgeCase() {
+        // This simulates a case where
+        // 1. User creates graph with 2 nodes and 1 edge between them.
+        // 2. Saves the graph
+        // 3. Removes the edge and creates same edge between the nodes
+        // 4. Saves the graph
+        val nodeId = UUID.randomUUID()
+        val nodeId2 = UUID.randomUUID()
+        val params = GraphSaveParams(
+                graph = GraphParams(name = "Graph 1"),
+                nodes = mutableListOf(
+                        NodeParams(name = "Node 1", clientId = nodeId),
+                        NodeParams(name = "Node 2", clientId = nodeId2)
+                ),
+                edges = mutableListOf(
+                        EdgeParams(fromNodeId = nodeId, toNodeId = nodeId2)
+                )
+        )
+        val savedGraph = graphSave.save(params)
+        val updateParams = GraphSaveParams(
+                graph = GraphParams(id = savedGraph.id, name = savedGraph.name),
+                nodes = savedGraph.nodes.map {
+                    NodeParams(id = it.id, name = it.name, clientId = it.clientId)
+                }.toMutableList(),
+                edges = mutableListOf(
+                        EdgeParams(fromNodeId = savedGraph.nodes.first().id, toNodeId = savedGraph.nodes.last().id)
+                )
+        )
+        val savedGraph2 = graphSave.save(updateParams)
+        Assertions.assertThat(savedGraph2.nodes.count()).isEqualTo(2)
+        Assertions.assertThat(savedGraph2.uniqueEdges().count()).isEqualTo(1)
+    }
 }

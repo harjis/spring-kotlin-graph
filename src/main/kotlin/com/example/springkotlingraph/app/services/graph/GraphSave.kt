@@ -123,10 +123,10 @@ class GraphSave(private val graphRepository: GraphRepository) {
     }
 
     private fun deleteEdges(params: GraphSaveParams, graph: Graph) {
+        // Quite funny. If you have this println a lot of tests start to fail
+//        println(graph.uniqueEdges().first())
         graph.uniqueEdges().forEach {
-            val edgeInParams = params.edges.find { edgeParams ->
-                edgeParams.fromNodeId == it.fromNode.id && edgeParams.toNodeId == it.toNode.id
-            }
+            val edgeInParams = params.edges.find { edgeParams -> edgeParams.id == it.id }
             if (edgeInParams == null) {
                 graph.removeEdge(it)
             }
@@ -148,4 +148,4 @@ data class GraphSaveParams(
 data class GraphParams(val id: Long? = null, val name: String)
 data class NodeParams(var id: Long? = null, val name: String, val clientId: UUID)
 //TODO I would like nodeId's to be string | number
-data class EdgeParams(val id: Long? = null, val fromNodeId: Any, val toNodeId: Any)
+data class EdgeParams(val id: Long? = null, val fromNodeId: Any?, val toNodeId: Any?)
