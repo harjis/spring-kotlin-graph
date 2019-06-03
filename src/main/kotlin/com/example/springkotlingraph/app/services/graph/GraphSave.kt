@@ -123,8 +123,6 @@ class GraphSave(private val graphRepository: GraphRepository) {
     }
 
     private fun deleteEdges(params: GraphSaveParams, graph: Graph) {
-        // Quite funny. If you have this println a lot of tests start to fail
-//        println(graph.uniqueEdges().first())
         graph.uniqueEdges().forEach {
             val edgeInParams = params.edges.find { edgeParams -> edgeParams.id == it.id }
             if (edgeInParams == null) {
