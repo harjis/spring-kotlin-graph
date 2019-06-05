@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import java.util.*
 import javax.transaction.Transactional
 
 @Configuration
@@ -17,8 +18,8 @@ class Seeds {
     @Transactional
     fun initDatabase(graphRepository: GraphRepository) = CommandLineRunner {
         val graph = Graph(name = "Graph 1")
-        val node1 = Node(name = "Node 1", graph = graph)
-        val node2 = Node(name = "Node 2", graph = graph)
+        val node1 = Node(name = "Node 1", graph = graph, clientId = UUID.randomUUID())
+        val node2 = Node(name = "Node 2", graph = graph, clientId = UUID.randomUUID())
         Edge(fromNode = node1, toNode = node2)
         graphRepository.save(graph)
     }
