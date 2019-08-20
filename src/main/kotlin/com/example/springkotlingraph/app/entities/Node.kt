@@ -9,30 +9,46 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
+@Suppress("LeakingThis")
 @Entity
 class Node(
         var name: String,
-        val clientId: UUID,
 
         @JsonBackReference
         @ManyToOne
         @JoinColumn(name = "graph_id", nullable = false)
         val graph: Graph,
 
-        @JsonManagedReference
-        @OneToMany(mappedBy = "fromNode", cascade = [CascadeType.ALL])
-        val fromEdges: MutableList<Edge> = mutableListOf(),
+        id: UUID = UUID.randomUUID()
+) : AbstractJpaPersistable<UUID>(id) {
 
-        @JsonManagedReference
-        @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL])
-        val toEdges: MutableList<Edge> = mutableListOf()
-) : AbstractJpaPersistable<Long>() {
     init {
-        this.graph.nodes.add(this)
+        this.graph.addNode(this)
+    }
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "fromNode", cascade = [CascadeType.ALL])
+    val fromEdges: MutableSet<Edge> = mutableSetOf()
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL])
+    val toEdges: MutableSet<Edge> = mutableSetOf()
+
+    fun addFromEdge(edge: Edge) {
+        this.fromEdges.add(edge)
+    }
+
+    fun addToEdge(edge: Edge) {
+        this.toEdges.add(edge)
     }
 
     fun removeEdge(edge: Edge) {
         this.fromEdges.removeIf { it.id == edge.id }
         this.toEdges.removeIf { it.id == edge.id }
+    }
+
+    fun removeEdgeIf(block: (Edge) -> Boolean) {
+        this.fromEdges.removeIf(block)
+        this.toEdges.removeIf(block)
     }
 }

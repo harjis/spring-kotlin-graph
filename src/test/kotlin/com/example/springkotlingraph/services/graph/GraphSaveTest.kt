@@ -5,8 +5,8 @@ import com.example.springkotlingraph.app.repositories.GraphRepository
 import com.example.springkotlingraph.app.repositories.NodeRepository
 import com.example.springkotlingraph.app.services.graph.EdgeParams
 import com.example.springkotlingraph.app.services.graph.GraphParams
-import com.example.springkotlingraph.app.services.graph.GraphSave
 import com.example.springkotlingraph.app.services.graph.GraphSaveParams
+import com.example.springkotlingraph.app.services.graph.GraphSaveService
 import com.example.springkotlingraph.app.services.graph.NodeParams
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class GraphSaveTest {
     @Autowired
     lateinit var graphRepository: GraphRepository
     @Autowired
-    lateinit var graphSave: GraphSave
+    lateinit var graphSave: GraphSaveService
     @Autowired
     lateinit var edgeRepository: EdgeRepository
     @Autowired
@@ -52,8 +52,8 @@ class GraphSaveTest {
     @Test
     fun canSaveGraphNodes() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         graphSave.save(params)
@@ -66,18 +66,18 @@ class GraphSaveTest {
     @Test
     fun canUpdateGraphNodes() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = "Updated " + it.name)
                 }.toMutableList()
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         val graphs = graphRepository.findAll()
         Assertions.assertThat(graphs.count()).isEqualTo(1)
         val graph = graphs.first()
@@ -90,8 +90,8 @@ class GraphSaveTest {
     @Test
     fun canRemoveNodes() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         val savedGraph = graphSave.save(params)
@@ -99,17 +99,17 @@ class GraphSaveTest {
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes
                         .map {
-                            NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                            NodeParams(id = it.id, name = "Updated " + it.name)
                         }.toMutableList()
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         val deleteParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.take(1).map {
-                    NodeParams(id = it.id, name = it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = it.name)
                 }.toMutableList()
         )
-        graphSave.save(deleteParams)
+        graphSave.update(savedGraph.id, deleteParams)
         val graphs = graphRepository.findAll()
         Assertions.assertThat(graphs.count()).isEqualTo(1)
         val graph = graphs.first()
@@ -123,24 +123,23 @@ class GraphSaveTest {
         val params = GraphSaveParams(
                 graph = GraphParams(name = "Graph 1"),
                 nodes = mutableListOf(
-                        NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                        NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                        NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                        NodeParams(name = "Node 2", id = UUID.randomUUID())
                 )
         )
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes
-                        .map { NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId) }
-                        .plus(NodeParams(name = "New Node 3", clientId = UUID.randomUUID()))
+                        .map { NodeParams(id = it.id, name = "Updated " + it.name) }
+                        .plus(NodeParams(name = "New Node 3", id = UUID.randomUUID()))
                         .toMutableList()
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         val graphs = graphRepository.findAll()
         Assertions.assertThat(graphs.count()).isEqualTo(1)
         val graph = graphs.first()
         Assertions.assertThat(graph.name).isEqualTo("Updated Graph 1")
-        val edges = edgeRepository.findAll()
         val nodes = nodeRepository.findAll()
         Assertions.assertThat(nodes.count()).isEqualTo(3)
 
@@ -153,24 +152,25 @@ class GraphSaveTest {
     @Test
     fun canSaveEdges() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = "Updated " + it.name)
                 }.toMutableList(),
                 edges = mutableListOf(
                         EdgeParams(
-                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
-                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                                id = UUID.randomUUID(),
+                                fromId = savedGraph.nodes.first().id,
+                                toId = savedGraph.nodes.last().id
                         )
                 )
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         val graphs = graphRepository.findAll()
         val graph = graphs.first()
         Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
@@ -179,32 +179,32 @@ class GraphSaveTest {
     @Test
     fun canRemoveEdges() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = "Updated " + it.name)
                 }.toMutableList(),
                 edges = mutableListOf(
                         EdgeParams(
-                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
-                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                                fromId = savedGraph.nodes.first().id,
+                                toId = savedGraph.nodes.last().id
                         )
                 )
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         val deleteParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = "Updated " + it.name)
                 }.toMutableList(),
                 edges = mutableListOf()
         )
-        graphSave.save(deleteParams)
+        graphSave.update(savedGraph.id, deleteParams)
         val graphs = graphRepository.findAll()
         val graph = graphs.first()
         Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(0)
@@ -213,28 +213,28 @@ class GraphSaveTest {
     @Test
     fun canNotCreateDuplicateEdges() {
         val nodesParams = mutableListOf(
-                NodeParams(name = "Node 1", clientId = UUID.randomUUID()),
-                NodeParams(name = "Node 2", clientId = UUID.randomUUID())
+                NodeParams(name = "Node 1", id = UUID.randomUUID()),
+                NodeParams(name = "Node 2", id = UUID.randomUUID())
         )
         val params = GraphSaveParams(graph = GraphParams(name = "Graph 1"), nodes = nodesParams)
         var savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = "Updated Graph 1"),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = "Updated " + it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = "Updated " + it.name)
                 }.toMutableList(),
                 edges = mutableListOf(
                         EdgeParams(
-                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
-                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                                fromId = savedGraph.nodes.first().id,
+                                toId = savedGraph.nodes.last().id
                         ),
                         EdgeParams(
-                                fromNodeId = savedGraph.nodes.first().id!!.toLong(),
-                                toNodeId = savedGraph.nodes.last().id!!.toLong()
+                                fromId = savedGraph.nodes.first().id,
+                                toId = savedGraph.nodes.last().id
                         )
                 )
         )
-        graphSave.save(updateParams)
+        graphSave.update(savedGraph.id, updateParams)
         // Doesn't really make sense to me. Imo data integrity expection should be thrown with
         // graphRepository.findAll too. I would have expected that getting the record again would
         // return persisted data but it seems that it doesnt do that
@@ -249,11 +249,11 @@ class GraphSaveTest {
         val params = GraphSaveParams(
                 graph = GraphParams(name = "Graph 1"),
                 nodes = mutableListOf(
-                        NodeParams(name = "Node 1", clientId = nodeId),
-                        NodeParams(name = "Node 2", clientId = nodeId2)
+                        NodeParams(name = "Node 1", id = nodeId),
+                        NodeParams(name = "Node 2", id = nodeId2)
                 ),
                 edges = mutableListOf(
-                        EdgeParams(fromNodeId = nodeId, toNodeId = nodeId2)
+                        EdgeParams(fromId = nodeId, toId = nodeId2)
                 )
         )
         val savedGraph = graphSave.save(params)
@@ -273,24 +273,24 @@ class GraphSaveTest {
         val params = GraphSaveParams(
                 graph = GraphParams(name = "Graph 1"),
                 nodes = mutableListOf(
-                        NodeParams(name = "Node 1", clientId = nodeId),
-                        NodeParams(name = "Node 2", clientId = nodeId2)
+                        NodeParams(name = "Node 1", id = nodeId),
+                        NodeParams(name = "Node 2", id = nodeId2)
                 ),
                 edges = mutableListOf(
-                        EdgeParams(fromNodeId = nodeId, toNodeId = nodeId2)
+                        EdgeParams(fromId = nodeId, toId = nodeId2)
                 )
         )
         val savedGraph = graphSave.save(params)
         val updateParams = GraphSaveParams(
                 graph = GraphParams(id = savedGraph.id, name = savedGraph.name),
                 nodes = savedGraph.nodes.map {
-                    NodeParams(id = it.id, name = it.name, clientId = it.clientId)
+                    NodeParams(id = it.id, name = it.name)
                 }.toMutableList(),
                 edges = mutableListOf(
-                        EdgeParams(fromNodeId = savedGraph.nodes.first().id, toNodeId = savedGraph.nodes.last().id)
+                        EdgeParams(fromId = savedGraph.nodes.first().id, toId = savedGraph.nodes.last().id)
                 )
         )
-        val savedGraph2 = graphSave.save(updateParams)
+        val savedGraph2 = graphSave.update(savedGraph.id, updateParams)
         Assertions.assertThat(savedGraph2.nodes.count()).isEqualTo(2)
         Assertions.assertThat(savedGraph2.uniqueEdges().count()).isEqualTo(1)
     }
