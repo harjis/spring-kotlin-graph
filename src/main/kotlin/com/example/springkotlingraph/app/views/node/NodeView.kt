@@ -7,7 +7,7 @@ data class NodeView(
         val graphId: UUID,
         val id: UUID,
         val name: String,
-        val toEdgeIds: List<String> = listOf(),
+        val toEdgeIds: List<UUID>,
         val type: String = "InputNode",
         val x: Float,
         val y: Float

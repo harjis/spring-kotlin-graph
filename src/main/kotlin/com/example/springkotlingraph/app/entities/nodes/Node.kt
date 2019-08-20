@@ -54,8 +54,9 @@ class Node(
 fun Node.render() = NodeView(
         graphId = this.graph.id,
         id = this.id,
-        type = this::class.simpleName!!,//TODO is there a better way than this?
         name = this.name,
+        toEdgeIds = this.toEdges.map { it.id },
+        type = this::class.simpleName!!,//TODO is there a better way than this?
         x = this.x,
         y = this.y
 )
