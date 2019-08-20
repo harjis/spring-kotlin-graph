@@ -2,7 +2,7 @@ package com.example.springkotlingraph.app.services.graph
 
 import com.example.springkotlingraph.app.entities.Edge
 import com.example.springkotlingraph.app.entities.Graph
-import com.example.springkotlingraph.app.entities.Node
+import com.example.springkotlingraph.app.entities.nodes.Node
 import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,5 +1,6 @@
 package com.example.springkotlingraph.app.entities
 
+import com.example.springkotlingraph.app.entities.nodes.Node
 import com.example.springkotlingraph.app.views.graph.GraphView
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -17,10 +18,6 @@ class Graph(
 
     fun addNode(node: Node) {
         nodes.add(node)
-    }
-
-    fun nodeById(nodeId: UUID): Node? {
-        return this.nodes.find { it.id == nodeId }
     }
 
     fun updateNodes(block: (Node) -> Unit) {

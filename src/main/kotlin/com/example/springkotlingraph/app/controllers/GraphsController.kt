@@ -25,6 +25,7 @@ class GraphsController(
     @PostMapping("/{graphId}/save_all")
     fun save(@PathVariable graphId: UUID, @RequestBody request: GraphSaveParams): Boolean {
         val graph = graphSaveService.update(graphId, request)
+        // TODO if errors return them here
         return true
     }
 }

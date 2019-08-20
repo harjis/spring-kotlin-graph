@@ -1,5 +1,6 @@
 package com.example.springkotlingraph.app.entities
 
+import com.example.springkotlingraph.app.entities.nodes.Node
 import com.example.springkotlingraph.app.views.edge.EdgeView
 import java.util.UUID
 import javax.persistence.Entity

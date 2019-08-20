@@ -1,6 +1,6 @@
 package com.example.springkotlingraph.app.controllers
 
-import com.example.springkotlingraph.app.entities.render
+import com.example.springkotlingraph.app.entities.nodes.render
 import com.example.springkotlingraph.app.exceptions.EntityNotFound
 import com.example.springkotlingraph.app.repositories.GraphRepository
 import com.example.springkotlingraph.app.views.node.NodeView

@@ -1,14 +1,20 @@
-package com.example.springkotlingraph.app.entities
+package com.example.springkotlingraph.app.entities.nodes
 
+import com.example.springkotlingraph.app.entities.AbstractJpaPersistable
+import com.example.springkotlingraph.app.entities.Edge
+import com.example.springkotlingraph.app.entities.Graph
 import com.example.springkotlingraph.app.views.node.NodeView
 import java.util.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.Inheritance
+import javax.persistence.InheritanceType
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 class Node(
         @ManyToOne
         @JoinColumn(name = "graph_id", nullable = false)
@@ -39,11 +45,6 @@ class Node(
         this.toEdges.add(edge)
     }
 
-    fun removeEdge(edge: Edge) {
-        this.fromEdges.removeIf { it.id == edge.id }
-        this.toEdges.removeIf { it.id == edge.id }
-    }
-
     fun removeEdgeIf(block: (Edge) -> Boolean) {
         this.fromEdges.removeIf(block)
         this.toEdges.removeIf(block)
@@ -53,6 +54,7 @@ class Node(
 fun Node.render() = NodeView(
         graphId = this.graph.id,
         id = this.id,
+        type = this::class.simpleName!!,//TODO is there a better way than this?
         name = this.name,
         x = this.x,
         y = this.y
