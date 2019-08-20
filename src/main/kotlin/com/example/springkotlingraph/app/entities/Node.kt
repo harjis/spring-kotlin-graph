@@ -51,7 +51,7 @@ class Node(
 }
 
 fun Node.render() = NodeView(
-        graph_id = this.graph.id,
+        graphId = this.graph.id,
         id = this.id,
         name = this.name,
         x = this.x,

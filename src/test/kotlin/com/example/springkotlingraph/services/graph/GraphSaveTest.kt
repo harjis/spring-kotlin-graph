@@ -165,8 +165,8 @@ class GraphSaveTest {
                 edges = mutableListOf(
                         EdgeParams(
                                 id = UUID.randomUUID(),
-                                fromId = savedGraph.nodes.first().id,
-                                toId = savedGraph.nodes.last().id
+                                fromNodeId = savedGraph.nodes.first().id,
+                                toNodeId = savedGraph.nodes.last().id
                         )
                 )
         )
@@ -191,8 +191,8 @@ class GraphSaveTest {
                 }.toMutableList(),
                 edges = mutableListOf(
                         EdgeParams(
-                                fromId = savedGraph.nodes.first().id,
-                                toId = savedGraph.nodes.last().id
+                                fromNodeId = savedGraph.nodes.first().id,
+                                toNodeId = savedGraph.nodes.last().id
                         )
                 )
         )
@@ -225,12 +225,12 @@ class GraphSaveTest {
                 }.toMutableList(),
                 edges = mutableListOf(
                         EdgeParams(
-                                fromId = savedGraph.nodes.first().id,
-                                toId = savedGraph.nodes.last().id
+                                fromNodeId = savedGraph.nodes.first().id,
+                                toNodeId = savedGraph.nodes.last().id
                         ),
                         EdgeParams(
-                                fromId = savedGraph.nodes.first().id,
-                                toId = savedGraph.nodes.last().id
+                                fromNodeId = savedGraph.nodes.first().id,
+                                toNodeId = savedGraph.nodes.last().id
                         )
                 )
         )
@@ -253,7 +253,7 @@ class GraphSaveTest {
                         NodeParams(name = "Node 2", id = nodeId2)
                 ),
                 edges = mutableListOf(
-                        EdgeParams(fromId = nodeId, toId = nodeId2)
+                        EdgeParams(fromNodeId = nodeId, toNodeId = nodeId2)
                 )
         )
         val savedGraph = graphSave.save(params)
@@ -277,7 +277,7 @@ class GraphSaveTest {
                         NodeParams(name = "Node 2", id = nodeId2)
                 ),
                 edges = mutableListOf(
-                        EdgeParams(fromId = nodeId, toId = nodeId2)
+                        EdgeParams(fromNodeId = nodeId, toNodeId = nodeId2)
                 )
         )
         val savedGraph = graphSave.save(params)
@@ -287,7 +287,7 @@ class GraphSaveTest {
                     NodeParams(id = it.id, name = it.name)
                 }.toMutableList(),
                 edges = mutableListOf(
-                        EdgeParams(fromId = savedGraph.nodes.first().id, toId = savedGraph.nodes.last().id)
+                        EdgeParams(fromNodeId = savedGraph.nodes.first().id, toNodeId = savedGraph.nodes.last().id)
                 )
         )
         val savedGraph2 = graphSave.update(savedGraph.id, updateParams)

@@ -16,8 +16,8 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
         val graph = Graph(name = graphParams.name, id = graphParams.id)
         val nodes = nodeParams.map { it.id to Node(graph, it.name, it.x, it.y, it.id) }.toMap()
         edgeParams.forEach { edge ->
-            val fromNode = nodes[edge.fromId] ?: throw IllegalArgumentException("")
-            val toNode = nodes[edge.toId] ?: throw IllegalArgumentException("")
+            val fromNode = nodes[edge.fromNodeId] ?: throw IllegalArgumentException("")
+            val toNode = nodes[edge.toNodeId] ?: throw IllegalArgumentException("")
             Edge(fromNode, toNode, edge.id)
         }
         return graphRepository.save(graph)
@@ -53,6 +53,8 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
             val nodeParam = idToNodeParam[node.id] ?: return@updateNodes
             node.apply {
                 name = nodeParam.name
+                x = nodeParam.x
+                y = nodeParam.y
             }
         }
     }
@@ -66,8 +68,8 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
         val newEdges = edgeParams.filter { it.id !in currentEdges }
         val nodeIdToNode = graph.nodes.associateBy { it.id }
         newEdges.forEach { edgeParam ->
-            val fromNode = nodeIdToNode[edgeParam.fromId] ?: throw IllegalStateException("")
-            val toNode = nodeIdToNode[edgeParam.toId] ?: throw IllegalStateException("")
+            val fromNode = nodeIdToNode[edgeParam.fromNodeId] ?: throw IllegalStateException("")
+            val toNode = nodeIdToNode[edgeParam.toNodeId] ?: throw IllegalStateException("")
             Edge(fromNode, toNode, edgeParam.id)
         }
     }
@@ -82,4 +84,4 @@ data class GraphSaveParams(
 
 data class GraphParams(val name: String, val id: UUID = UUID.randomUUID())
 data class NodeParams(val name: String, val x: Float = 0F, val y: Float = 0F, val id: UUID = UUID.randomUUID())
-data class EdgeParams(val fromId: UUID, val toId: UUID, val id: UUID = UUID.randomUUID())
+data class EdgeParams(val fromNodeId: UUID, val toNodeId: UUID, val id: UUID = UUID.randomUUID())

@@ -28,7 +28,7 @@ class Edge(
 }
 
 fun Edge.render() = EdgeView(
-        from_node_id = this.fromNode.id,
+        fromNodeId = this.fromNode.id,
         id = this.id,
-        to_node_id = this.toNode.id
+        toNodeId = this.toNode.id
 )
