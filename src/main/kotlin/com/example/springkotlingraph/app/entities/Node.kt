@@ -1,7 +1,6 @@
 package com.example.springkotlingraph.app.entities
 
-import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.example.springkotlingraph.app.views.node.NodeView
 import java.util.*
 import javax.persistence.CascadeType
 import javax.persistence.Entity
@@ -9,15 +8,15 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 
-@Suppress("LeakingThis")
 @Entity
 class Node(
-        var name: String,
-
-        @JsonBackReference
         @ManyToOne
         @JoinColumn(name = "graph_id", nullable = false)
         val graph: Graph,
+
+        var name: String,
+        var x: Float,
+        var y: Float,
 
         id: UUID = UUID.randomUUID()
 ) : AbstractJpaPersistable<UUID>(id) {
@@ -26,11 +25,9 @@ class Node(
         this.graph.addNode(this)
     }
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "fromNode", cascade = [CascadeType.ALL])
     val fromEdges: MutableSet<Edge> = mutableSetOf()
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL])
     val toEdges: MutableSet<Edge> = mutableSetOf()
 
@@ -52,3 +49,11 @@ class Node(
         this.toEdges.removeIf(block)
     }
 }
+
+fun Node.render() = NodeView(
+        graph_id = this.graph.id,
+        id = this.id,
+        name = this.name,
+        x = this.x,
+        y = this.y
+)

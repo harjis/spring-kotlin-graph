@@ -1,7 +1,6 @@
 package com.example.springkotlingraph.app.entities
 
-import com.fasterxml.jackson.annotation.JsonGetter
-import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.example.springkotlingraph.app.views.graph.GraphView
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Entity
@@ -13,7 +12,6 @@ class Graph(
         id: UUID = UUID.randomUUID()
 ) : AbstractJpaPersistable<UUID>(id) {
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "graph", cascade = [CascadeType.ALL], orphanRemoval = true)
     val nodes: MutableSet<Node> = mutableSetOf()
 
@@ -29,7 +27,6 @@ class Graph(
         nodes.map(block)
     }
 
-    @JsonGetter
     fun uniqueEdges(): List<Edge> {
         return this.nodes.flatMap { it.fromEdges.union(it.toEdges) }.distinctBy { it.id }
     }
@@ -42,3 +39,8 @@ class Graph(
         this.nodes.map { it.removeEdgeIf(block) }
     }
 }
+
+fun Graph.render() = GraphView(
+        id = this.id,
+        name = this.name
+)

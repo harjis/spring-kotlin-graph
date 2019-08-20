@@ -8,7 +8,6 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import java.util.*
 import javax.transaction.Transactional
 
 @Configuration
@@ -17,10 +16,19 @@ class Seeds {
     @Bean
     @Transactional
     fun initDatabase(graphRepository: GraphRepository) = CommandLineRunner {
-        val graph = Graph(name = "Graph 1", id = UUID.randomUUID())
-        val node1 = Node(name = "Node 1", graph = graph, id = UUID.randomUUID())
-        val node2 = Node(name = "Node 2", graph = graph, id = UUID.randomUUID())
-        Edge(fromNode = node1, toNode = node2, id = UUID.randomUUID())
+        if (graphRepository.findAll().count() > 0) {
+            return@CommandLineRunner
+        }
+        val graph = Graph(name = "Graph 1")
+        val node1 = Node(name = "InputNode 1", graph = graph, x = 50F, y = 200F)
+        val node2 = Node(name = "OutputNode 1", graph = graph, x = 300F, y = 400F)
+        Edge(fromNode = node1, toNode = node2)
         graphRepository.save(graph)
+
+        val graph2 = Graph(name = "Graph 2")
+        val node21 = Node(name = "InputNode 2", graph = graph2, x = 10F, y = 10F)
+        val node22 = Node(name = "OutputNode 2", graph = graph2, x = 400F, y = 200F)
+        Edge(fromNode = node21, toNode = node22)
+        graphRepository.save(graph2)
     }
 }

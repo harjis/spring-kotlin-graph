@@ -14,7 +14,7 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
     fun save(params: GraphSaveParams): Graph {
         val (graphParams, nodeParams, edgeParams) = params
         val graph = Graph(name = graphParams.name, id = graphParams.id)
-        val nodes = nodeParams.map { it.id to Node(it.name, graph, it.id) }.toMap()
+        val nodes = nodeParams.map { it.id to Node(graph, it.name, it.x, it.y, it.id) }.toMap()
         edgeParams.forEach { edge ->
             val fromNode = nodes[edge.fromId] ?: throw IllegalArgumentException("")
             val toNode = nodes[edge.toId] ?: throw IllegalArgumentException("")
@@ -58,7 +58,7 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
     }
 
     private fun addNewNodes(graph: Graph, nodeParams: Collection<NodeParams>) {
-        nodeParams.forEach { Node(it.name, graph, it.id) }
+        nodeParams.forEach { Node(graph, it.name, it.x, it.y, it.id) }
     }
 
     private fun addNewEdges(graph: Graph, edgeParams: Collection<EdgeParams>) {
@@ -81,5 +81,5 @@ data class GraphSaveParams(
 )
 
 data class GraphParams(val name: String, val id: UUID = UUID.randomUUID())
-data class NodeParams(val name: String, val id: UUID = UUID.randomUUID())
+data class NodeParams(val name: String, val x: Float = 0F, val y: Float = 0F, val id: UUID = UUID.randomUUID())
 data class EdgeParams(val fromId: UUID, val toId: UUID, val id: UUID = UUID.randomUUID())
