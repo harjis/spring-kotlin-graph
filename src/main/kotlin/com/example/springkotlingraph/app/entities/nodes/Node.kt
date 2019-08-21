@@ -31,10 +31,10 @@ class Node(
         this.graph.addNode(this)
     }
 
-    @OneToMany(mappedBy = "fromNode", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "fromNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val fromEdges: MutableSet<Edge> = mutableSetOf()
 
-    @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "toNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val toEdges: MutableSet<Edge> = mutableSetOf()
 
     fun addFromEdge(edge: Edge) {

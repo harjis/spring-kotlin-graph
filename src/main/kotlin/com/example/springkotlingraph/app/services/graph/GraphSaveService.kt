@@ -42,17 +42,10 @@ class GraphSaveService(private val graphRepository: GraphRepository, private val
     }
 
     private fun removeUnused(graph: Graph, nodeParams: List<NodeParams>, edgeParams: List<EdgeParams>) {
-        println("remove unused")
         val newNodeIds = nodeParams.map { it.id }
         val newEdgeIds = edgeParams.map { it.id }
         graph.removeNodeIf { it.id !in newNodeIds }
-        graph.uniqueEdges().forEach {
-            val edgeInParams = edgeParams.find { edgeParams -> edgeParams.id == it.id }
-            if (edgeInParams == null) {
-                println("deleteee")
-                edgeRepository.deleteById(it.id)
-            }
-        }
+        graph.removeEdgeIf { it.id !in newEdgeIds }
     }
 
     private fun updateOldNodes(graph: Graph, nodeParams: Collection<NodeParams>) {

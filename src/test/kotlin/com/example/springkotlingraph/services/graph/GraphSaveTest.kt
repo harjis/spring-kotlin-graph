@@ -173,7 +173,7 @@ class GraphSaveTest {
         graphSave.update(savedGraph.id, updateParams)
         val graphs = graphRepository.findAll()
         val graph = graphs.first()
-        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(1)
+        Assertions.assertThat(edgeRepository.findAll().count()).isEqualTo(1)
     }
 
     @Test
@@ -207,7 +207,7 @@ class GraphSaveTest {
         graphSave.update(savedGraph.id, deleteParams)
         val graphs = graphRepository.findAll()
         val graph = graphs.first()
-        Assertions.assertThat(graph.uniqueEdges().count()).isEqualTo(0)
+        Assertions.assertThat(edgeRepository.findAll().count()).isEqualTo(0)
     }
 
     @Test
@@ -258,7 +258,7 @@ class GraphSaveTest {
         )
         val savedGraph = graphSave.save(params)
         Assertions.assertThat(savedGraph.nodes.count()).isEqualTo(2)
-        Assertions.assertThat(savedGraph.uniqueEdges().count()).isEqualTo(1)
+        Assertions.assertThat(edgeRepository.findAll().count()).isEqualTo(1)
     }
 
     @Test
@@ -292,7 +292,7 @@ class GraphSaveTest {
         )
         val savedGraph2 = graphSave.update(savedGraph.id, updateParams)
         Assertions.assertThat(savedGraph2.nodes.count()).isEqualTo(2)
-        Assertions.assertThat(savedGraph2.uniqueEdges().count()).isEqualTo(1)
+        Assertions.assertThat(edgeRepository.findAll().count()).isEqualTo(1)
     }
 
     @Test
