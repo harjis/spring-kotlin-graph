@@ -3,6 +3,7 @@ package com.example.springkotlingraph.app.services.graph
 import com.example.springkotlingraph.app.entities.Edge
 import com.example.springkotlingraph.app.entities.Graph
 import com.example.springkotlingraph.app.entities.nodes.Node
+import com.example.springkotlingraph.app.repositories.EdgeRepository
 import com.example.springkotlingraph.app.repositories.GraphRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -10,7 +11,7 @@ import java.util.UUID
 
 @Service
 @Transactional
-class GraphSaveService(private val graphRepository: GraphRepository) {
+class GraphSaveService(private val graphRepository: GraphRepository, private val edgeRepository: EdgeRepository) {
     fun save(params: GraphSaveParams): Graph {
         val (graphParams, nodeParams, edgeParams) = params
         val graph = Graph(name = graphParams.name, id = graphParams.id)
@@ -41,10 +42,17 @@ class GraphSaveService(private val graphRepository: GraphRepository) {
     }
 
     private fun removeUnused(graph: Graph, nodeParams: List<NodeParams>, edgeParams: List<EdgeParams>) {
+        println("remove unused")
         val newNodeIds = nodeParams.map { it.id }
         val newEdgeIds = edgeParams.map { it.id }
         graph.removeNodeIf { it.id !in newNodeIds }
-        graph.removeEdgeIf { it.id !in newEdgeIds }
+        graph.uniqueEdges().forEach {
+            val edgeInParams = edgeParams.find { edgeParams -> edgeParams.id == it.id }
+            if (edgeInParams == null) {
+                println("deleteee")
+                edgeRepository.deleteById(it.id)
+            }
+        }
     }
 
     private fun updateOldNodes(graph: Graph, nodeParams: Collection<NodeParams>) {

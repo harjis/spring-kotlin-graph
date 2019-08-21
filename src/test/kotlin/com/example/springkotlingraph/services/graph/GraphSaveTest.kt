@@ -324,6 +324,6 @@ class GraphSaveTest {
         )
         val savedGraph2 = graphSave.update(savedGraph.id, updateParams)
         Assertions.assertThat(savedGraph2.nodes.count()).isEqualTo(2)
-        Assertions.assertThat(savedGraph2.uniqueEdges().count()).isEqualTo(0)
+        Assertions.assertThat(edgeRepository.findAll().count()).isEqualTo(0)
     }
 }
